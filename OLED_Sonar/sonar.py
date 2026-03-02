@@ -3,6 +3,7 @@ import time
  
 Trig = Pin(26, Pin.OUT, 0)
 Echo = Pin(27, Pin.IN, 0)
+led = Pin(22, Pin.OUT, 0) #Pin for an LED
 DISTANCE = 0
 SOUNDVELOCITY = 340
 MAXIMUM_DISTANCE_CM = 200
@@ -36,4 +37,12 @@ while True:
         print("Distance: Out of Range") #if the distance is out of range then it will print out of range
     else:
         print("Distance", DISTANCE, "cm")
+        if(DISTANCE < 10):
+            led.value(1) #turns on the LED if the distance is less than 10cm
+            time.sleep_ms(50)
+            led.value(0)
+        else:
+            led.value(0) #turns off the LED if the distance is greater than 10cm
+           
+            
      #records the distance to the terminal.

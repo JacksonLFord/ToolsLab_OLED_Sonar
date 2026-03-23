@@ -1,4 +1,5 @@
 from machine import Pin, ADC, I2C
+import framebuf
 from utime import sleep, ticks_ms, ticks_diff
 import time
 
@@ -143,6 +144,40 @@ while True:
         oled.text("30cm", 88, 38)
         oled.hline(0, 50, 128, 1)                 # Baseline for bar graph
         oled.fill_rect(0, 52, bar_width, 8, 1)    # Filled bar representing distance
+
+        # --- Rotated "FORD" text on right edge ---
+        # Draw "FORD" into a small framebuffer, then blit it rotated 90 degrees
+        word = "FORD"
+        fw = len(word) * 8                        # Width of text in pixels (8px per char)
+        fh = 8                                    # Height of one text row in pixels
+
+        # Allocate a byte buffer large enough to hold the word as a 1-bit bitmap
+        # +1 ensures no off-by-one underflow if fw*fh isn't divisible by 8
+        buf = bytearray(fw * fh // 8 + 1)
+
+        # Wrap buffer in a FrameBuffer so we can use .text() to draw into it
+        fb  = framebuf.FrameBuffer(buf, fw, fh, framebuf.MONO_HLSB)
+        fb.fill(0)                                # Clear the temp buffer before drawing
+        fb.text(word, 0, 0, 1)                    # Render "FORD" at top-left of temp buffer
+
+        # --- Blit rotated 90 degrees clockwise, anchored to top-right corner ---
+        # Normal orientation: word runs left→right, pixels at (x, y)
+        # After 90° CW rotation: x becomes the new row (dy), y becomes the new col from right (dx)
+        # So: dx = 127 - y  (y=0 maps to col 127, the rightmost column)
+        #     dy = x         (x=0 maps to row 0, the top of the screen)
+        for x in range(fw):                       # x walks along the word left→right
+            for y in range(fh):                   # y walks down the 8px tall glyph row
+
+                # --- Extract the pixel at (x, y) from the flat MONO_HLSB buffer ---
+                # MONO_HLSB packs pixels left-to-right, MSB first, row by row
+                byte_index = (y * fw + x) // 8        # Which byte this pixel lives in
+                bit_index  = 7 - ((y * fw + x) % 8)  # Which bit within that byte (MSB=left)
+                pixel = (buf[byte_index] >> bit_index) & 1  # Extract the bit (0 or 1)
+
+                if pixel:                         # Skip dark/off pixels — only draw lit ones
+                    dx = 127 - y                  # Map glyph row → screen column (right edge)
+                    dy = x                        # Map glyph column → screen row (top of screen)
+                    oled.pixel(dx, dy, 1)         # Plot the rotated pixel onto the main display
 
         oled.show()                               # Push updated frame to display
 

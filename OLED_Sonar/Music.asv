@@ -1,0 +1,10 @@
+
+notes = {'C' 'D' 'E' 'F' 'G' 'A' 'B'};
+freq = [261.63 293.66 329.63 349.23 392.00 440.00 493.88];
+% Above sets up th frequencies for each of thenotes
+
+NoteLength = 0.5; % Each note plays for half a second (THIS IS TEMPO - If the note length changes as the song goes, you will have to have an array)
+Samples    = 4000;         
+SampleRate = 1/Samples;  % You are sampling a sine wave, so you are getting each part of the sin wave. Its to emulate smooth sound by taking a lot of points from a line
+
+a = [];                               

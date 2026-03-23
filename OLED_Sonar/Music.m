@@ -1,28 +1,72 @@
-% These are the notes and frequencies for the song Never Gonna Give you Up
-% by Rick Astley
-notes = {'A' 'B' 'C#' 'D' 'E' 'F#' 'G#'};
-freq = [440.00 493.88 554.37 587.33 659.25 739.99 830.61];
+% =============================================================
+% --- Song of Storms - Legend of Zelda: Ocarina of Time ---
+% --- Key: D minor, fixed note length for simplicity ---
+% =============================================================
+
+% --- Notes needed for D minor scale ---
+notes = {'D' 'E' 'F' 'G' 'A' 'Bb' 'C'};
+
+% --- Frequencies in octave 4 ---
+% D minor sits perfectly in the mid range of a small breadboard speaker
+freq = [293.66 329.63 349.23 392.00 440.00 466.16 523.25];
+
+% --- Tempo: Song of Storms is around 180 BPM, snappy and energetic ---
+BPM     = 180;
+Q       = 60 / BPM;    % Quarter note (~0.33s)
+E       = Q / 2;       % Eighth note (~0.17s)
+H       = Q * 2;       % Half note (~0.67s)
+DQ      = Q * 1.5;     % Dotted quarter (~0.50s)
+
+Samples    = 4000;
+SampleRate = 1 / Samples;
+
+% --- Melody: main loop of Song of Storms ---
 Melody = {...
-    'A'  'B'  'D'  'B'  ...  % Never gonna give you up
-    'F#' 'F#' 'E'  ...       % Never gonna give you up
-    'A'  'B'  'D'  'B'  ...  % Never gonna let you down
-    'E'  'E'  'D'  'C#' ...  % Never gonna let you down
-    'A'  'B'  'D'  'B'  ...  % Never gonna run around
-    'C#' 'D'  'C#' 'A'  ...  % and desert you
-    'A'  'D'  'C#' 'B'  ...  % Never gonna make you cry
-    'A'  'B'  'D'  'B'  ...  % Never gonna say goodbye
-    'C#' 'D'  'E'  'D'  'C#' 'B' ... % Never gonna tell a lie
-    'A'  'D'  'C#' ...       % and hurt you
+    'D'  'F'  'D'  ...       % Main motif (first 3 notes, very iconic)
+    'D'  'F'  'D'  ...       % Repeat of motif
+    'E'  'E'  ...            % Rising step
+    'C'  'C'  ...            % Falling step
+    'A'  ...                 % Anchor note
+    'D'  'F'  'D'  ...       % Motif again
+    'D'  'F'  'D'  ...       % Motif repeat
+    'E'  'G'  'E'  ...       % Second phrase rising
+    'C'  'C'  ...            % Falling back
+    'A'  ...                 % Anchor
+    'F'  'F'  'G'  'F'  'E' ... % Running melody passage
+    'D'  'E'  'F'  'A'  ...  % Ascending run
+    'D'  'C'  'A'  ...       % Descending resolution
+    'F'  'F'  'G'  'F'  'E' ... % Running passage repeat
+    'D'  'E'  'F'  'A'  ...  % Ascending run repeat
+    'D'  'C'  'A'  ...       % Final resolution
 };
 
-NoteLength = 0.27; % Each note plays for half a second (THIS IS TEMPO - If the note length changes as the song goes, you will have to have an array)
-Samples    = 4000;         
-SampleRate = 1/Samples;  % You are sampling a sine wave, so you are getting each part of the sin wave. Its to emulate smooth sound by taking a lot of points from a line
+% --- Matching lengths for each note above ---
+Lengths = [...
+    E    E    Q    ...       % Main motif
+    E    E    Q    ...       % Repeat
+    E    E    ...            % Rising
+    E    E    ...            % Falling
+    H    ...                 % Anchor held
+    E    E    Q    ...       % Motif again
+    E    E    Q    ...       % Repeat
+    E    E    E    ...       % Second phrase
+    E    E    ...            % Falling
+    H    ...                 % Anchor held
+    E    E    E    E    E    ... % Running passage
+    E    E    E    DQ   ...  % Ascending run
+    E    E    H    ...       % Resolution
+    E    E    E    E    E    ... % Running repeat
+    E    E    E    DQ   ...  % Ascending repeat
+    E    E    H    ...       % Final resolution
+];
+
+% --- Build audio buffer ---
 a = [];
-for i = 1:numel(Melody) % This iterates over the list of notes and adds it to th array
-    FreqIndex = strcmp(notes,Melody{i}); % This gets the index of I in the array notes
-    note = 0:SampleRate:NoteLength - SampleRate; %This creates a sequence of time events where we will make sounds
-    a = [a sin(2*pi*freq(FreqIndex)*note)]; %This is just sin(2πft), where the array is a bunch of "sound wave" shapes. The a[ a ] is basically a a++.           
-end;
-                   
-sound(a,Samples);
+
+for i = 1:numel(Melody)
+    FreqIndex = strcmp(notes, Melody{i});              % Look up frequency index
+    note = 0:SampleRate:Lengths(i) - SampleRate;      % Time array for this note
+    a = [a sin(2*pi*freq(FreqIndex)*note)];            % Append sine wave to buffer
+end
+
+sound(a, Samples);

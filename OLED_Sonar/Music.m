@@ -1,9 +1,18 @@
-
-notes = {'C' 'D' 'E' 'F' 'G' 'A' 'B'};
-freq = [261.63 293.66 329.63 349.23 392.00 440.00 493.88];
+% These are the notes and frequencies for the song suga suga.
+notes = {'C' 'D' 'Eb' 'F' 'G' 'Ab' 'Bb'};
+freq = [261.63 293.66 311.13 349.23 392.00 415.30 466.16];
 % Above sets up th frequencies for each of thenotes
-Melody = {'C','D','F'};
-NoteLength = 0.5; % Each note plays for half a second (THIS IS TEMPO - If the note length changes as the song goes, you will have to have an array)
+Melody = {...
+    'F'  'F'  'Eb' 'F'  ...     % Suga suga...
+    'Bb' 'Ab' 'F'  'Eb' ...     % ...how you get so fly
+    'F'  'F'  'Eb' 'F'  ...     % Suga suga...
+    'Ab' 'G'  'F'  'Eb' ...     % ...how you get so fly
+    'F'  'F'  'Eb' 'F'  ...     % Repeat of hook
+    'Bb' 'Ab' 'F'  'Eb' ...
+    'F'  'Ab' 'Bb' 'Ab' ...
+    'F'  'Eb' 'F'  'F'  ...
+};
+NoteLength = 0.3; % Each note plays for half a second (THIS IS TEMPO - If the note length changes as the song goes, you will have to have an array)
 Samples    = 4000;         
 SampleRate = 1/Samples;  % You are sampling a sine wave, so you are getting each part of the sin wave. Its to emulate smooth sound by taking a lot of points from a line
 a = [];

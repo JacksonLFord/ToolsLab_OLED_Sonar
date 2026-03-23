@@ -1,18 +1,21 @@
-% These are the notes and frequencies for the song suga suga.
-notes = {'C' 'D' 'Eb' 'F' 'G' 'Ab' 'Bb'};
-freq = [261.63 293.66 311.13 349.23 392.00 415.30 466.16];
-% Above sets up th frequencies for each of thenotes
+% These are the notes and frequencies for the song Never Gonna Give you Up
+% by Rick Astley
+notes = {'A' 'B' 'C#' 'D' 'E' 'F#' 'G#'};
+freq = [440.00 493.88 554.37 587.33 659.25 739.99 830.61];
 Melody = {...
-    'F'  'F'  'Eb' 'F'  ...     % Suga suga...
-    'Bb' 'Ab' 'F'  'Eb' ...     % ...how you get so fly
-    'F'  'F'  'Eb' 'F'  ...     % Suga suga...
-    'Ab' 'G'  'F'  'Eb' ...     % ...how you get so fly
-    'F'  'F'  'Eb' 'F'  ...     % Repeat of hook
-    'Bb' 'Ab' 'F'  'Eb' ...
-    'F'  'Ab' 'Bb' 'Ab' ...
-    'F'  'Eb' 'F'  'F'  ...
+    'A'  'B'  'D'  'B'  ...  % Never gonna give you up
+    'F#' 'F#' 'E'  ...       % Never gonna give you up
+    'A'  'B'  'D'  'B'  ...  % Never gonna let you down
+    'E'  'E'  'D'  'C#' ...  % Never gonna let you down
+    'A'  'B'  'D'  'B'  ...  % Never gonna run around
+    'C#' 'D'  'C#' 'A'  ...  % and desert you
+    'A'  'D'  'C#' 'B'  ...  % Never gonna make you cry
+    'A'  'B'  'D'  'B'  ...  % Never gonna say goodbye
+    'C#' 'D'  'E'  'D'  'C#' 'B' ... % Never gonna tell a lie
+    'A'  'D'  'C#' ...       % and hurt you
 };
-NoteLength = 0.3; % Each note plays for half a second (THIS IS TEMPO - If the note length changes as the song goes, you will have to have an array)
+
+NoteLength = 0.27; % Each note plays for half a second (THIS IS TEMPO - If the note length changes as the song goes, you will have to have an array)
 Samples    = 4000;         
 SampleRate = 1/Samples;  % You are sampling a sine wave, so you are getting each part of the sin wave. Its to emulate smooth sound by taking a lot of points from a line
 a = [];

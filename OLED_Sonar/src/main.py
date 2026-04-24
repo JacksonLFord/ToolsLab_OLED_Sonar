@@ -16,6 +16,7 @@ gp13.freq(1000)
 # ── OLED ──
 i2c = I2C(1, sda=Pin(2), scl=Pin(3), freq=400000)
 devices = i2c.scan()
+print(devices)
 if devices:
     from sh1106 import SH1106_I2C
     oled = SH1106_I2C(128, 64, i2c, addr=devices[0])
@@ -23,11 +24,12 @@ else:
     oled = None
 
 # ── TUNE THESE ──
-SPEED       = 50
-BALANCE     = 55
-TURN        = 55
-THRESHOLD   = 3.25
-SLOW_FACTOR = 0.8   # 20% speed reduction on turns
+SPEED        = 50
+BALANCE      = 52
+TURN         = 85
+THRESHOLD    = 3.25
+SLOW_FACTOR  = 0.8
+STOP_CONFIRM = 8
 
 def drive(steering, balance, speed=None):
     if speed is None:
@@ -109,39 +111,58 @@ def update_oled(status, arrow, left_on, right_on, left_v, right_v, steering):
 
 print("=== LINE FOLLOWER ===")
 
-STEERING = 90
-cycle    = 0
+STEERING   = 90
+cycle      = 0
+stop_count = 0
 
 while True:
     left_on, right_on, left_v, right_v = read_ir()
 
     if left_on and right_on:
-        stop()
-        status = "STOPPED"
-        arrow  = "  X  "
+        stop_count += 1
+        if stop_count >= STOP_CONFIRM:
+            stop()
+            status = "STOPPED"
+            arrow  = "  X  "
+            update_oled(status, arrow, left_on, right_on, left_v, right_v, STEERING)
+            # Wait until both sensors see white again
+            while True:
+                left_on, right_on, left_v, right_v = read_ir()
+                if not left_on and not right_on:
+                    stop_count = 0
+                    break
+                time.sleep(0.05)
+        else:
+            status = "STRAIGHT"
+            arrow  = "  ^  "
+            drive(90, BALANCE)
 
     elif not left_on and not right_on:
-        STEERING = 90
-        status   = "LOST"
-        arrow    = "  ?  "
+        stop_count = 0
+        STEERING   = 90
+        status     = "LOST"
+        arrow      = "  ?  "
         drive(STEERING, BALANCE)
 
     elif left_on and not right_on:
-        STEERING = 90 - TURN
-        status   = "LEFT"
-        arrow    = " <   "
+        stop_count = 0
+        STEERING   = 90 - TURN
+        status     = "LEFT"
+        arrow      = " <   "
         drive(STEERING, BALANCE, speed=int(SPEED * SLOW_FACTOR))
 
     elif right_on and not left_on:
-        STEERING = 90 + TURN
-        status   = "RIGHT"
-        arrow    = "   > "
+        stop_count = 0
+        STEERING   = 90 + TURN
+        status     = "RIGHT"
+        arrow      = "   > "
         drive(STEERING, BALANCE, speed=int(SPEED * SLOW_FACTOR))
 
     else:
-        STEERING = 90
-        status   = "STRAIGHT"
-        arrow    = "  ^  "
+        stop_count = 0
+        STEERING   = 90
+        status     = "STRAIGHT"
+        arrow      = "  ^  "
         drive(STEERING, BALANCE)
 
     cycle += 1
@@ -149,6 +170,6 @@ while True:
         update_oled(status, arrow, left_on, right_on, left_v, right_v, STEERING)
         cycle = 0
 
-    print(f"{status} | L:{left_v}V({'B' if left_on else 'W'}) R:{right_v}V({'B' if right_on else 'W'})")
+    print(f"{status} | L:{left_v}V({'B' if left_on else 'W'}) R:{right_v}V({'B' if right_on else 'W'}) | StopCount:{stop_count}")
 
     time.sleep(0.01)
